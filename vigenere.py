@@ -1,3 +1,9 @@
+# LINKS
+# http://www.dcode.fr/vigenere-cipher
+# https://akela.mendelu.cz/~foltynek/KAS/historie/vigenere2.php
+# https://regex101.com/
+# https://repl.it/
+
 # IMPORTS
 import re
 
@@ -125,11 +131,13 @@ def find_key_length(dictionary):
 input_raw = load_input()
 input_converted = convert_input(input_raw)
 print("\r\nEdited cipher text (in case of accented or illegal characters):\r\n %s" % (input_converted))
+
 repetitive_parts = find_repetitive_parts(input_converted)
 print("\r\nFound repetitive parts in cipher text:\r\n ", end='')
 print(*repetitive_parts, sep=', ')
-distances = calculate_distances(repetitive_parts)
-key_length = find_key_length(distances)
-print("Found key length(s):\r\n")
 
-print(key_length)
+distances = calculate_distances(repetitive_parts)
+
+key_length = find_key_length(distances)
+print("\r\nFound key length(s):\r\n ", end='')
+print(*key_length, sep=', ')
