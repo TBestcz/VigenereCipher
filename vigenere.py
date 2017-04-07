@@ -6,6 +6,7 @@
 
 # IMPORTS
 import re
+import os
 
 # VARIABLES
 #cipher_text = "MOYONCTCJKXOIKXIVGTSYIGOFIHOHQNLECIWFPKSAQLNWNCNEJRLEWICOHYYDJJEWTMAWKJVULZIFEDDVSUFALICICAEFEJIKJAZIEPGHZQORCOEKXLESZYGKGRPQSZPQTAQQEWYNQNQWVQSXIMMWVZXYEGUVQWCJJOFBODEIIWNIWRSXJDGTCLILSQFHKLAUZSIIWTUOHEECDQQIBOKPLXVGWUPDCEPAOMFTAQMFCTWQVQDBPATYLAKEYGOSUEOTIKMWSCXISVUTJEEKVMEEJAGMWOLRZHNSCZUBIZLOROUTMSSMOFYWSDSMVQQYTLGYSXSFGQNSQZFCSYZTSVVPQOLWUDETDAUTZEMVRYMPXQGDEUDOZIDAFEQQOTSZEBZVOGOYGREMUGSVILOJETVGAOXOVRZXSRYYZSQVNHTUZCAMJXVGTQJADRKZGPKJADUPIXOWYNCGMOBOZEHVRQRKJADGFEZRGFEIEEDPHAINERRR"
@@ -31,20 +32,22 @@ input_raw = ""
 input_converted = ""
 repetitive_parts = []
 distances = {}
-key_length = []
+key_lengths = []
+run = True
 
 # FUNCTIONS
-def load_input():
-  print("Vigenere Cipher Decoder")
-  print("Kamil Poruba, Jan Hudec, Patrik Burda")
-  print("TAKR Project II")
-  print("Brno University of Technology, 2017")
+def print_head():
+    print("This code is intended to be run under Python 3. No backward compatibility!\r\n")
+    print("Vigenere Cipher Decoder")
+    print("Kamil Poruba, Jan Hudec, Patrik Burda")
+    print("TAKR Project II")
+    print("Brno University of Technology, 2017\r\n")
 
-  return input("\r\nEnter cipher text to decode:\r\n")
+def load_input():
+  return input("\r\nEnter cipher text to decode or type \"quit\" to exit:\r\n ")
 
 def convert_input(text):
-  """Replaces Czech accents, converts all lowercase characters to uppercase, and removes all invalid character from input.
-  """
+  """Replaces Czech accents, converts all lowercase characters to uppercase, and removes all invalid character from input."""
   output = []
 
   for char in text:
@@ -59,8 +62,7 @@ def convert_input(text):
   return ''.join(output)
 
 def find_repetitive_parts(text):
-  """Finds all repetitive parts in input.
-  """
+  """Finds all repetitive parts in input. """
   index = 0
   length = len(text)
   output = []
@@ -84,8 +86,7 @@ def find_repetitive_parts(text):
   return output
 
 def calculate_distances(parts):
-  """Calculates distances between repetitive parts in input.
-  """
+  """Calculates distances between repetitive parts in input."""
   output = {}
 
   # takes each repetitive part and finds all characters between them using regex
@@ -107,10 +108,9 @@ def calculate_distances(parts):
 
   return output
 
-def find_key_length(dictionary):
+def find_key_lengths(dictionary):
   """Calculates the expected key length from common divisors of individual repetitive parts.
-  Most represented divisor is probably the key length.
-  """
+  Most represented divisor is probably the key length."""
   value_temp = 0
   output = []
 
@@ -127,17 +127,45 @@ def find_key_length(dictionary):
 
   return output
 
+def decode_input(keys):
+    for i in range(len(keys)):
+        print("\r\nDecoding message for key length of %i characters:\r\n " % keys[i])
+
 # MAIN
-input_raw = load_input()
-input_converted = convert_input(input_raw)
-print("\r\nEdited cipher text (in case of accented or illegal characters):\r\n %s" % (input_converted))
+while run:
+    os.system('cls' if os.name == 'nt' else 'clear')
 
-repetitive_parts = find_repetitive_parts(input_converted)
-print("\r\nFound repetitive parts in cipher text:\r\n ", end='')
-print(*repetitive_parts, sep=', ')
+    print_head()
+    input_raw = load_input()
 
-distances = calculate_distances(repetitive_parts)
+    if input_raw.lower() != "quit":
+        if len(input_raw) > 0:
+            input_converted = convert_input(input_raw)
 
-key_length = find_key_length(distances)
-print("\r\nFound key length(s):\r\n ", end='')
-print(*key_length, sep=', ')
+            if len(input_converted):
+                print("\r\nEdited cipher text (in case of accented or illegal characters):\r\n %s" % (input_converted))
+
+                repetitive_parts = find_repetitive_parts(input_converted)
+
+                if len(repetitive_parts):
+                    print("\r\nFound repetitive parts in cipher text:\r\n ", end='')
+                    print(*repetitive_parts, sep=', ')
+
+                    distances = calculate_distances(repetitive_parts)
+                    key_lengths = find_key_lengths(distances)
+
+                    print("\r\nFound key length(s):\r\n ", end='')
+                    print(*key_lengths, sep=', ')
+
+                    decode_input(key_lengths)
+                else:
+                    print("\r\nNo repetitive parts have been found, decode is not possible.")
+            else:
+                print("\r\nEdited input does not contain any characters to decode.")
+        else:
+            print("No input")
+
+        input("\r\n\r\nPress Enter to continue.\r\n")
+    else:
+        print("\r\nExiting...\r\n")
+        run = False
