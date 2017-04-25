@@ -1,6 +1,7 @@
 # IMPORTS
 import re
 import os
+import datetime as dt
 
 # VARIABLES
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -44,9 +45,15 @@ input_decoded = []
 repetitive_parts = []
 distances = {}
 key_lengths = []
+micros1 = 0
+micros2 = 0
 run = True
 
 # FUNCTIONS
+def micros():
+    """Return timestamp in seconds since 1. 1. 1970."""
+    return dt.datetime.now().timestamp()
+
 def print_head():
     """Prints information text about this program."""
     print("This code is intended to be run under Python 3. No backward compatibility!\r\n")
@@ -57,7 +64,7 @@ def print_head():
 
 def load_input():
     """Loads the cipher text from user."""
-    return input("\r\nEnter cipher text to decode or type \"quit\" to exit:\r\n ")
+    return input("\r\nEnter cipher text to decode or type \"exit\":\r\n ")
 
 def convert_input(text):
     """Replaces Czech accents, converts all lowercase characters to uppercase, and removes all invalid character from input."""
@@ -140,13 +147,13 @@ def find_key_lengths(dictionary):
 
     return output
 
-def split_input_by_key(text, index = 0):
+def split_input_by_key(text, length):
     """Splits the converted input into separate parts based on found key length(s)."""
     output = []
 
     # take each n-th character from text with n as step being the length of key
-    for i in range(key_lengths[index]):
-        output.append(text[i::key_lengths[index]])
+    for i in range(length):
+        output.append(text[i::length])
 
     return output
 
@@ -188,7 +195,7 @@ def decode_by_key(text, key):
 
     return part_decoded
 
-def decode_parts(keys):
+def decode_parts(length):
     """Splits input, counts frequency analysis of each part, finds key(s) and decodes input."""
     output = []
     frequency_temp = {}
@@ -197,44 +204,43 @@ def decode_parts(keys):
     key = ""
 
     # repeat process for each found key
-    for i in range(len(keys)):
-        print("\r\nDecoding message for key length of %i characters:\r\n" % keys[i], end='')
+    print("\r\nDecoding message for key length of %i characters:\r\n" % length, end='')
 
-        # split input into parts
-        print(" Split input into parts based on key length:")
-        input_split = split_input_by_key(input_converted, 0)
-        for i, part in enumerate(input_split):
-            print("  %i. part: %s" % (i + 1, part))
+    # split input into parts
+    print(" Split input into parts based on key length:")
+    input_split = split_input_by_key(input_converted, length)
+    for i, part in enumerate(input_split):
+        print("  %i. part: %s" % (i + 1, part))
 
-            # decode parts by each character in alphabet
-            for i in range(len(alphabet)):
-                input_shifted = []
-                decoded_char_index = 0
+        # decode parts by each character in alphabet
+        for i in range(len(alphabet)):
+            input_shifted = []
+            decoded_char_index = 0
 
-                for char in part:
-                    decoded_char_index = alphabet.find(char)
-                    decoded_char_index -= i
-                    decoded_char_index %= len(alphabet)
-                    input_shifted.append(alphabet[decoded_char_index])
+            for char in part:
+                decoded_char_index = alphabet.find(char)
+                decoded_char_index -= i
+                decoded_char_index %= len(alphabet)
+                input_shifted.append(alphabet[decoded_char_index])
 
-                # compute frequency analysis
-                frequency_temp[i] = count_frequency_diff(input_shifted)
+            # compute frequency analysis
+            frequency_temp[i] = count_frequency_diff(input_shifted)
 
-            # find the lowest deviation from frequency analysis of czech text
-            key_value = min(frequency_temp.values())
-            for i in frequency_temp.keys():
-                if frequency_temp[i] == key_value:
-                    key_char = alphabet[i]
+        # find the lowest deviation from frequency analysis of czech text
+        key_value = min(frequency_temp.values())
+        for i in frequency_temp.keys():
+            if frequency_temp[i] == key_value:
+                key_char = alphabet[i]
 
-            # add the character with the lowest deviation to key string
-            key += str(key_char)
+        # add the character with the lowest deviation to key string
+        key += str(key_char)
 
-            # decode each part with corresponding character of the key
-            output.append(decode_by_key(part, key_char))
+        # decode each part with corresponding character of the key
+        output.append(decode_by_key(part, key_char))
 
-        print("\r\n Found key is: %s" % key)
+    print("\r\n Found key is: %s" % key)
 
-        return output
+    return output
 
 def compose_decoded_parts(parts):
     """Composes final decoded message from separate decoded parts."""
@@ -260,12 +266,13 @@ while run:
     print_head()
     input_raw = load_input()
 
-    if input_raw.lower() != "quit":
+    if input_raw.lower() != "exit":
         if len(input_raw) > 0:
             input_converted = convert_input(input_raw)
 
             if len(input_converted):
                 print("\r\nEdited cipher text (in case of accented or illegal characters):\r\n %s" % (input_converted))
+                micros1 = micros()
 
                 repetitive_parts = find_repetitive_parts(input_converted)
 
@@ -279,11 +286,16 @@ while run:
                     print("\r\nFound key length(s):\r\n ", end='')
                     print(*key_lengths, sep=', ')
 
-                    input_split_decoded = decode_parts(key_lengths)
-                    input_decoded = compose_decoded_parts(input_split_decoded)
+                    for i in range(len(key_lengths)):
+                        input_split_decoded = decode_parts(key_lengths[i])
+                        input_decoded = compose_decoded_parts(input_split_decoded)
 
-                    print("\r\n Decrypted message is:\r\n  ", end='')
-                    print(*input_decoded, sep='')
+                        print("\r\n Decrypted message is:\r\n  ", end='')
+                        print(*input_decoded, sep='')
+
+                    micros2 = micros()
+
+                    print("\r\nDecrypting took %f seconds." % ((micros2 - micros1)))
                 else:
                     print("\r\nNo repetitive parts have been found, decode is not possible.")
             else:
