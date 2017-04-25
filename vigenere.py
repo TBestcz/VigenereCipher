@@ -51,7 +51,7 @@ run = True
 
 # FUNCTIONS
 def micros():
-    """Return timestamp in seconds since 1. 1. 1970."""
+    """Returns timestamp in seconds since 1. 1. 1970."""
     return dt.datetime.now().timestamp()
 
 def print_head():
@@ -203,7 +203,6 @@ def decode_parts(length):
     key_char = ''
     key = ""
 
-    # repeat process for each found key
     print("\r\nDecoding message for key length of %i characters:\r\n" % length, end='')
 
     # split input into parts
@@ -290,12 +289,12 @@ while run:
                         input_split_decoded = decode_parts(key_lengths[i])
                         input_decoded = compose_decoded_parts(input_split_decoded)
 
-                        print("\r\n Decrypted message is:\r\n  ", end='')
+                        print("\r\n Decodeded message is:\r\n  ", end='')
                         print(*input_decoded, sep='')
 
                     micros2 = micros()
 
-                    print("\r\nDecrypting took %f seconds." % ((micros2 - micros1)))
+                    print("\r\nDecoding took %f seconds." % (micros2 - micros1))
                 else:
                     print("\r\nNo repetitive parts have been found, decode is not possible.")
             else:
