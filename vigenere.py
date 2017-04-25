@@ -289,12 +289,12 @@ while run:
                         input_split_decoded = decode_parts(key_lengths[i])
                         input_decoded = compose_decoded_parts(input_split_decoded)
 
-                        print("\r\n Decodeded message is:\r\n  ", end='')
+                        print("\r\n Decoded message is:\r\n  ", end='')
                         print(*input_decoded, sep='')
 
                     micros2 = micros()
 
-                    print("\r\nDecoding took %f seconds." % (micros2 - micros1))
+                    print("\r\nDecoding finished in %f seconds." % (micros2 - micros1))
                 else:
                     print("\r\nNo repetitive parts have been found, decode is not possible.")
             else:
