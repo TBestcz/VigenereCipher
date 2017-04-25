@@ -83,7 +83,6 @@ def convert_input(text):
 
 def find_repetitive_parts(text):
     """Finds all repetitive parts in input. """
-    index = 0
     length = len(text)
     output = []
 
@@ -131,6 +130,7 @@ def calculate_distances(parts):
 def find_key_lengths(dictionary):
     """Calculates the expected key length from common divisors of individual repetitive parts.
     Most represented divisor is probably the key length."""
+    most_common_divisor_value = 0
     value_temp = 0
     output = []
 
@@ -184,7 +184,6 @@ def count_frequency_diff(text):
 def decode_by_key(text, key):
     """Decodes part of cipher text by respective char from found key."""
     part_decoded = []
-    decoded_char_index = 0
 
     # decode each character by key
     for char in text:
@@ -199,7 +198,6 @@ def decode_parts(length):
     """Splits input, counts frequency analysis of each part, finds key(s) and decodes input."""
     output = []
     frequency_temp = {}
-    key_value = 0
     key_char = ''
     key = ""
 
@@ -214,7 +212,6 @@ def decode_parts(length):
         # decode parts by each character in alphabet
         for i in range(len(alphabet)):
             input_shifted = []
-            decoded_char_index = 0
 
             for char in part:
                 decoded_char_index = alphabet.find(char)
